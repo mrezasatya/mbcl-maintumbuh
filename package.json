@@ -1,0 +1,29 @@
+{
+  "name": "main-tumbuh",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Penyusun rencana belajar-bermain 7 hari untuk orang tua dan anak usia 1 sampai 6 tahun.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node e2e/browser-check.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource/baloo-2": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
