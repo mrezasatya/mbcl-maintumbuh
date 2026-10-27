@@ -34,7 +34,7 @@ const SUPPORTED = `${formatAge(MIN_MONTHS)} sampai ${formatAge(MAX_MONTHS)}`;
 export function validateBirth(birthMonth, birthYear, now = new Date()) {
   const empty = (v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
   if (empty(birthMonth) || empty(birthYear)) {
-    return { ok: false, code: 'empty', message: 'Silakan pilih bulan dan tahun lahir anak terlebih dahulu.' };
+    return { ok: false, code: 'empty', message: 'Pilih dulu bulan dan tahun lahir si kecil, ya.' };
   }
 
   const m = toInt(birthMonth);
@@ -42,7 +42,7 @@ export function validateBirth(birthMonth, birthYear, now = new Date()) {
   const invalid = {
     ok: false,
     code: 'invalid',
-    message: 'Bulan atau tahun lahir tidak valid. Silakan pilih dari daftar yang tersedia.',
+    message: 'Bulan atau tahun lahirnya belum terbaca dengan benar. Coba pilih lagi dari daftar, ya.',
   };
   if (Number.isNaN(m) || Number.isNaN(y) || m < 1 || m > 12) return invalid;
 
@@ -52,7 +52,7 @@ export function validateBirth(birthMonth, birthYear, now = new Date()) {
     return {
       ok: false,
       code: 'future',
-      message: `${MONTH_NAMES[m - 1]} ${y} masih di masa depan. Periksa kembali bulan dan tahun lahir anak.`,
+      message: `${MONTH_NAMES[m - 1]} ${y} belum datang, nih. Coba periksa lagi bulan dan tahun lahirnya.`,
     };
   }
 
@@ -66,8 +66,8 @@ export function validateBirth(birthMonth, birthYear, now = new Date()) {
       code: 'tooYoung',
       months,
       message:
-        `Usia anak sekitar ${formatAge(months)}. Main Tumbuh saat ini mendukung usia ${SUPPORTED}. ` +
-        'Untuk stimulasi bayi di bawah 1 tahun, silakan berkonsultasi dengan dokter anak, bidan, atau posyandu terdekat.',
+        `Si kecil baru berusia sekitar ${formatAge(months)}. Saat ini Main Tumbuh menemani anak usia ${SUPPORTED}. ` +
+        'Untuk ide stimulasi bayi, dokter anak, bidan, atau kader posyandu terdekat adalah teman diskusi yang tepat.',
     };
   }
   if (months > MAX_MONTHS) {
@@ -75,7 +75,7 @@ export function validateBirth(birthMonth, birthYear, now = new Date()) {
       ok: false,
       code: 'tooOld',
       months,
-      message: `Usia anak sekitar ${formatAge(months)}. Main Tumbuh saat ini mendukung usia ${SUPPORTED}.`,
+      message: `Wah, si kecil sudah berusia sekitar ${formatAge(months)}. Saat ini Main Tumbuh menemani anak usia ${SUPPORTED}.`,
     };
   }
   return { ok: true, months };

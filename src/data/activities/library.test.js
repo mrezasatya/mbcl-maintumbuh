@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { ACTIVITIES } from './index.js';
+import { ACTIVITIES, DETAILS } from './index.js';
 import { KNOWN_TAGS, isActivitySafe } from '../../logic/safety.js';
 import { DOMAIN_IDS, MAX_MONTHS, MIN_MONTHS } from '../../logic/config.js';
 
 // Teks yang menggambarkan apa yang dilakukan dan dipakai anak.
 // Catatan keselamatan tidak ikut audit kata kunci karena wajar menyebut bahaya
 // ("jauhkan dari pisau"), tetapi tetap ikut audit kata terlarang.
-const activityText = (a) => [a.judul, a.tujuan, ...a.bahan, ...a.langkah].join(' ').toLowerCase();
+const activityText = (a) =>
+  [a.judul, a.tujuan, a.gambaran, a.manfaat, a.tips, ...a.bahan, ...a.langkah].join(' ').toLowerCase();
 const fullText = (a) => [activityText(a), a.keselamatan.toLowerCase()].join(' ');
 
 const word = (w) => new RegExp(`\\b${w}\\b`, 'i');
@@ -65,6 +66,21 @@ describe('audit pustaka kegiatan', () => {
       expect(a.max, where).toBeLessThanOrEqual(MAX_MONTHS);
       expect(a.keselamatan.trim(), where).not.toBe('');
     }
+  });
+
+  it('setiap kegiatan punya penjelasan rinci (gambaran, manfaat, tips)', () => {
+    for (const a of ACTIVITIES) {
+      for (const f of ['gambaran', 'manfaat', 'tips']) {
+        expect(typeof a[f], `${a.id}.${f}`).toBe('string');
+        expect(a[f].trim().length, `${a.id}.${f}`).toBeGreaterThan(40);
+      }
+      expect(a.gambaran.length, `${a.id}.gambaran cukup rinci`).toBeGreaterThan(100);
+    }
+  });
+
+  it('tidak ada penjelasan rinci tanpa kegiatan', () => {
+    const ids = new Set(ACTIVITIES.map((a) => a.id));
+    expect(Object.keys(DETAILS).filter((id) => !ids.has(id))).toEqual([]);
   });
 
   it('semua tag risiko dikenal', () => {

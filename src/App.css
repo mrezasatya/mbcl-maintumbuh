@@ -469,15 +469,24 @@ main:focus {
   margin-bottom: 12px;
 }
 
-.activity-card__emoji {
+.activity-card__mascot {
   flex: 0 0 auto;
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
   display: grid;
   place-items: center;
-  font-size: 1.9rem;
   background: var(--accent-soft);
+}
+
+.activity-card--cadangan .activity-card__mascot {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+}
+
+.activity-card__heading {
+  min-width: 0;
 }
 
 .activity-card__eyebrow {
@@ -849,14 +858,141 @@ dd {
     padding: 16px;
   }
 
-  .activity-card__emoji {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    font-size: 1.5rem;
+  .activity-card__mascot {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+  }
+
+  .activity-card__mascot .mascot {
+    width: 52px;
+    height: 52px;
   }
 
   .activity-card__title {
     font-size: 1.35rem;
+  }
+}
+
+/* ---------- Tambahan: hero hangat, kartu rinci, musik ---------- */
+.hero__hello {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--coral-deep);
+  margin-bottom: 4px;
+}
+
+.hero__lead--soft {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.birth-form__sub {
+  margin: -4px 0 14px;
+  color: var(--ink-soft);
+}
+
+.activity-card__goal {
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 4px 0 0;
+}
+
+.activity-card__section p {
+  max-width: 70ch;
+}
+
+.activity-card__why {
+  border-left: 4px solid var(--accent);
+  padding-left: 14px;
+}
+
+.activity-card__cols {
+  display: grid;
+  gap: 0 32px;
+}
+
+@media (min-width: 900px) {
+  .activity-card--utama .activity-card__cols {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  }
+}
+
+.activity-card__tips {
+  background: #fffaf0;
+  border: 2px dashed #f8df86;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.music-toggle {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 18px 8px 10px;
+  border-radius: 999px;
+  border: 3px solid #fff;
+  background: #6a42b3;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(43, 33, 64, 0.25);
+}
+
+.music-toggle__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.music-toggle.is-playing {
+  background: #b3306a;
+}
+
+.music-toggle.is-playing .music-toggle__icon {
+  animation: m-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes m-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.site-footer {
+  padding-bottom: 96px;
+}
+
+@media (max-width: 600px) {
+  .music-toggle {
+    padding: 0;
+    width: 52px;
+    height: 52px;
+    justify-content: center;
+  }
+
+  .music-toggle__icon {
+    background: none;
+  }
+
+  .music-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }

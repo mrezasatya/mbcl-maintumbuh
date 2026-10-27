@@ -18,6 +18,7 @@ const BirthForm = forwardRef(function BirthForm({ month, year, onChange, onSubmi
   return (
     <form className="birth-form" onSubmit={handleSubmit} noValidate aria-labelledby={`${id}-title`}>
       <h2 id={`${id}-title`} className="birth-form__title">Kapan si kecil lahir?</h2>
+      <p className="birth-form__sub">Pilih bulan dan tahunnya, ya. Tidak perlu tanggal.</p>
       <div className="birth-form__fields">
         <div className="field">
           <label htmlFor={`${id}-month`}>Bulan lahir</label>
@@ -52,15 +53,15 @@ const BirthForm = forwardRef(function BirthForm({ month, year, onChange, onSubmi
         </div>
       </div>
       <p id={noteId} className="birth-form__note">
-        Untuk usia {formatAge(MIN_MONTHS)} sampai {formatAge(MAX_MONTHS)}. Karena hanya bulan dan tahun yang
-        diisi, perkiraan usia bisa selisih sampai 1 bulan.
+        Main Tumbuh menemani anak usia {formatAge(MIN_MONTHS)} sampai {formatAge(MAX_MONTHS)}. Karena hanya
+        memakai bulan dan tahun, perkiraan usianya bisa meleset sekitar 1 bulan, dan itu tidak apa-apa.
       </p>
       {error && (
         <div id={errorId} className="birth-form__error" role="alert">
           <span aria-hidden="true">🙈</span> {error}
         </div>
       )}
-      <button type="submit" className="btn btn--primary btn--lg">Susun rencana 7 hari</button>
+      <button type="submit" className="btn btn--primary btn--lg">Ayo, susun rencana 7 hari!</button>
     </form>
   );
 });

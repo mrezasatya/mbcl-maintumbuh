@@ -2,7 +2,7 @@ export default function Disclaimer() {
   return (
     <section id="catatan-penting" className="disclaimer" aria-labelledby="disclaimer-title" tabIndex={-1}>
       <h2 id="disclaimer-title">
-        <span aria-hidden="true">📌</span> Catatan penting
+        <span aria-hidden="true">📌</span> Catatan penting untuk orang tua
       </h2>
       <ul>
         <li>

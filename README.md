@@ -12,9 +12,11 @@ bukan alat diagnosis, dan bukan klaim setara sekolah tertentu.
 2. Validasi: kosong, tidak valid, masa depan, terlalu muda (< 12 bulan, disertai saran ke dokter anak/bidan/posyandu), terlalu tua (> 83 bulan).
 3. Usia dalam bulan, ditampilkan "x tahun y bulan", dipetakan ke titik CDC terakhir yang sudah dilewati: 12, 15, 18, 24, 30 bulan, 3, 4, 5 tahun (titik 5 tahun dipakai sampai 6 tahun 11 bulan).
 4. Rencana 7 hari: satu domain per hari, tidak ada domain sama berurutan, kelima domain muncul, dua domain tambahan dipilih berbobot menurut usia.
-5. Kartu kegiatan: judul, tujuan, bahan, langkah, durasi, catatan keselamatan, plus satu kegiatan cadangan per hari.
+5. Kartu kegiatan: judul, tujuan, gambaran kegiatan, kenapa ini penting, bahan, langkah, tips & variasi, durasi, catatan keselamatan, plus satu kegiatan cadangan per hari.
 6. Penyaring keselamatan yang lebih ketat dari standar umum (tabel di bawah).
 7. Disclaimer di bawah halaman.
+8. Lima karakter hewan orisinal yang bergerak (SVG + CSS), satu per domain. Animasi berhenti otomatis bila perangkat meminta gerak dikurangi (`prefers-reduced-motion`).
+9. Musik instrumental opsional: melodi kotak musik ciptaan sendiri yang dibuat langsung di browser dengan Web Audio API (`src/logic/melody.js`, `src/audio/musicBox.js`). Tanpa berkas audio, tidak berbunyi otomatis, dan berhenti saat tab disembunyikan.
 
 Sengaja tidak ada tombol cetak/PDF.
 
@@ -67,8 +69,11 @@ npm run test:e2e
 ```
 src/
   logic/        config.js age.js safety.js planner.js rng.js (+ *.test.js)  -- logika murni tanpa React
+  logic/melody.js  data melodi kotak musik (+ melody.test.js)
+  audio/musicBox.js  pemutar Web Audio
   data/activities/  helper.js kasar.js halus.js bahasa.js kognitif.js sosem.js index.js (+ library.test.js)
-  components/   Logo BirthForm PlanView ActivityCard SafetyPanel Disclaimer
+  data/activities/detail/  penjelasan rinci (gambaran, manfaat, tips) per domain
+  components/   Logo BirthForm PlanView ActivityCard Mascots MusicToggle SafetyPanel Disclaimer
   App.jsx App.css index.css main.jsx
 e2e/browser-check.cjs
 docs/referensi/  bahan referensi internal (tidak di-deploy)
@@ -94,6 +99,8 @@ Konstanta penting (rentang usia `MIN_MONTHS`/`MAX_MONTHS`, titik CDC, domain, `R
    ```
 
    Domain diambil dari awalan id, dan id harus unik.
+   Tambahkan juga penjelasan rinci di `src/data/activities/detail/<domain>.js` dengan id yang sama:
+   `{ gambaran, manfaat, tips }`. Teks ini ikut diaudit kata kunci.
 3. Jalankan `npm test`. Audit pustaka akan gagal bila: field kurang, tag tidak dikenal, ada kata
    berisiko (mis. `air`, `tali`, `gunting`, `tangga`, `kancing`, `kacang`) tanpa tag yang sesuai, ada kata
    terlarang (balon, kompor, api, lilin, magnet, baterai, kantong plastik), benda kecil untuk < 48 bulan,

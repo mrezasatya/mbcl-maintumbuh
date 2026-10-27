@@ -1,5 +1,6 @@
 import { forwardRef, useRef } from 'react';
 import ActivityCard from './ActivityCard.jsx';
+import { Mascot } from './Mascots.jsx';
 import { DOMAINS } from '../logic/config.js';
 import { formatAge } from '../logic/age.js';
 
@@ -34,13 +35,14 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
     <section className="plan" aria-labelledby="plan-title">
       <div className="plan-summary">
         <h2 id="plan-title" ref={headingRef} tabIndex={-1}>
-          Rencana 7 hari untuk si kecil
+          Hore, rencana 7 hari sudah siap!
         </h2>
         <p className="plan-summary__age">
-          Usia <strong>{formatAge(months)}</strong> ({months} bulan)
+          Si kecil kini berusia <strong>{formatAge(months)}</strong> ({months} bulan).
         </p>
         <p className="plan-summary__band">
-          Titik acuan perkembangan: <strong>{band.label}</strong>
+          Kegiatan dipilih dengan acuan titik perkembangan <strong>{band.label}</strong>. Setiap hari ada satu
+          kegiatan utama dan satu cadangan. Ikuti minat si kecil, ya; tidak harus sempurna.
         </p>
         <div className="plan-summary__actions">
           <button type="button" className="btn btn--primary" onClick={onReshuffle}>
@@ -52,8 +54,8 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
         </div>
         <div className="filter-note">
           <p>
-            <span aria-hidden="true">🛡️</span> <strong>Penyaring keselamatan aktif.</strong> Untuk usia ini,
-            kegiatan dengan bahaya berikut disembunyikan:
+            <span aria-hidden="true">🛡️</span> <strong>Penyaring keselamatan aktif.</strong> Demi keamanan si
+            kecil, kegiatan dengan bahaya berikut kami sembunyikan untuk usia ini:
           </p>
           <ul className="filter-note__list">
             {filters.map((f) => (
@@ -101,7 +103,8 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
         tabIndex={0}
       >
         <p className="day-panel__intro">
-          <strong>Hari {day.hari}</strong> · fokus {domain.nama} <span aria-hidden="true">{domain.emoji}</span>
+          <strong>Hari {day.hari}</strong> · hari ini kita bermain sambil melatih <strong>{domain.nama}</strong>{' '}
+          bersama {domain.hewan} <span aria-hidden="true">{domain.emoji}</span>
         </p>
         <ActivityCard activity={day.utama} months={months} variant="utama" headingLevel={3} />
 
@@ -109,7 +112,7 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
           <summary>
             <span aria-hidden="true">🎒</span> Kegiatan cadangan: {day.cadangan.judul}
           </summary>
-          <p className="backup__hint">Pakai bila anak kurang tertarik atau bahan utama tidak tersedia.</p>
+          <p className="backup__hint">Kalau si kecil sedang kurang tertarik atau bahannya tidak ada, coba yang ini.</p>
           <ActivityCard activity={day.cadangan} months={months} variant="cadangan" headingLevel={4} />
         </details>
 

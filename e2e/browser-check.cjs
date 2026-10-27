@@ -27,7 +27,7 @@ function monthsAgo(n) {
 async function choose(page, { month, year }) {
   await page.getByLabel('Bulan lahir').selectOption(String(month));
   await page.getByLabel('Tahun lahir').selectOption(String(year));
-  await page.getByRole('button', { name: 'Susun rencana 7 hari' }).click();
+  await page.getByRole('button', { name: 'Ayo, susun rencana 7 hari!' }).click();
 }
 
 async function noOverflow(page, width) {
@@ -62,18 +62,21 @@ async function noOverflow(page, width) {
       (await page.locator('text=/Cambridge|Montessori|\\bIB\\b|kurikulum internasional/i').count()) === 0,
       `${width}px: tidak ada label kurikulum di UI`,
     );
+    check((await page.locator('.parade .mascot').count()) === 5, `${width}px: lima karakter hewan tampil`);
+    const music = page.locator('.music-toggle');
+    check((await music.getAttribute('aria-pressed')) === 'false', `${width}px: musik tidak berbunyi otomatis`);
     await noOverflow(page, width);
     await page.screenshot({ path: path.join(SHOT_DIR, `awal-${width}.png`), fullPage: true });
 
     if (width === 390) {
       // Alur galat
-      await page.getByRole('button', { name: 'Susun rencana 7 hari' }).click();
-      check(/pilih bulan dan tahun/i.test(await page.getByRole('alert').innerText()), 'galat kosong');
+      await page.getByRole('button', { name: 'Ayo, susun rencana 7 hari!' }).click();
+      check(/pilih dulu bulan dan tahun/i.test(await page.getByRole('alert').innerText()), 'galat kosong');
 
       const now = new Date();
       if (now.getMonth() < 11) {
         await choose(page, { month: now.getMonth() + 2, year: now.getFullYear() });
-        check(/masa depan/i.test(await page.getByRole('alert').innerText()), 'galat masa depan');
+        check(/belum datang/i.test(await page.getByRole('alert').innerText()), 'galat masa depan');
       }
 
       await choose(page, monthsAgo(6));
@@ -81,13 +84,13 @@ async function noOverflow(page, width) {
       check(/0 tahun 6 bulan/.test(young) && /posyandu/.test(young), 'galat terlalu muda menyebut usia dan saran');
 
       await choose(page, { month: 1, year: now.getFullYear() - 10 });
-      check(/mendukung usia 1 tahun 0 bulan sampai 6 tahun 11 bulan/.test(await page.getByRole('alert').innerText()), 'galat terlalu tua');
+      check(/menemani anak usia 1 tahun 0 bulan sampai 6 tahun 11 bulan/.test(await page.getByRole('alert').innerText()), 'galat terlalu tua');
       await page.screenshot({ path: path.join(SHOT_DIR, `galat-${width}.png`) });
     }
 
     // Alur sukses: 27 bulan
     await choose(page, monthsAgo(27));
-    await page.getByRole('heading', { name: 'Rencana 7 hari untuk si kecil' }).waitFor();
+    await page.getByRole('heading', { name: 'Hore, rencana 7 hari sudah siap!' }).waitFor();
     check(await page.getByText('2 tahun 3 bulan').first().isVisible(), `${width}px: ringkasan usia "2 tahun 3 bulan"`);
     check(await page.getByText('(27 bulan)').isVisible(), `${width}px: usia dalam bulan`);
     check((await page.getByRole('tab').count()) === 7, `${width}px: 7 tab hari`);
@@ -97,7 +100,7 @@ async function noOverflow(page, width) {
       const top = document.getElementById('plan-title')?.getBoundingClientRect().top;
       return top !== undefined && top < 200;
     }, null, { timeout: 3000 }).catch(() => {});
-    const headingTop = await page.getByRole('heading', { name: 'Rencana 7 hari untuk si kecil' }).evaluate((el) => el.getBoundingClientRect().top);
+    const headingTop = await page.getByRole('heading', { name: 'Hore, rencana 7 hari sudah siap!' }).evaluate((el) => el.getBoundingClientRect().top);
     check(headingTop < 200, `${width}px: halaman digulir ke hasil (top ${Math.round(headingTop)})`);
     await noOverflow(page, width);
     await page.screenshot({ path: path.join(SHOT_DIR, `rencana-${width}.png`), fullPage: true });
@@ -142,6 +145,20 @@ async function noOverflow(page, width) {
       check(await page.getByRole('heading', { name: 'Tidak pernah muncul' }).isVisible(), 'panel aturan terbuka');
       await page.screenshot({ path: path.join(SHOT_DIR, `aturan-${width}.png`), fullPage: true });
 
+      // Musik
+      const music = page.locator('.music-toggle');
+      await music.click();
+      await page.waitForTimeout(300);
+      check((await music.getAttribute('aria-pressed')) === 'true', 'tombol musik memutar');
+      check(/Hentikan musik/.test(await music.innerText()), 'label berubah menjadi Hentikan musik');
+      await music.click();
+      check((await music.getAttribute('aria-pressed')) === 'false', 'tombol musik menghentikan');
+
+      // Kartu rinci
+      for (const t of ['Gambaran kegiatan', 'Kenapa ini penting?', 'Siapkan bahan', 'Ayo mulai', 'Tips & variasi']) {
+        check(await page.locator('.activity-card--utama').getByRole('heading', { name: t }).isVisible(), `kartu memuat bagian "${t}"`);
+      }
+
       // Ganti usia
       await page.getByRole('button', { name: 'Ganti usia' }).click();
       check((await page.getByRole('tab').count()) === 0, 'Ganti usia menutup rencana');
@@ -157,7 +174,7 @@ async function noOverflow(page, width) {
 
     // Usia 5 tahun ke atas memakai titik 5 tahun
     await choose(page, monthsAgo(70));
-    check(await page.getByText('Titik acuan perkembangan: 5 tahun').isVisible(), `${width}px: usia 70 bulan memakai titik 5 tahun`);
+    check(await page.getByText('titik perkembangan 5 tahun').isVisible(), `${width}px: usia 70 bulan memakai titik 5 tahun`);
     await noOverflow(page, width);
 
     await context.close();

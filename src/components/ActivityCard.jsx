@@ -1,5 +1,6 @@
 import { DOMAINS } from '../logic/config.js';
 import { SAFETY_TAGS, generalSupervision } from '../logic/safety.js';
+import { Mascot } from './Mascots.jsx';
 
 export default function ActivityCard({ activity, months, variant = 'utama', headingLevel = 3 }) {
   const domain = DOMAINS[activity.domain];
@@ -13,40 +14,60 @@ export default function ActivityCard({ activity, months, variant = 'utama', head
       style={{ '--accent': domain.warna, '--accent-soft': domain.lembut }}
     >
       <header className="activity-card__header">
-        <span className="activity-card__emoji" aria-hidden="true">{domain.emoji}</span>
-        <div>
-          {variant === 'utama' && <p className="activity-card__eyebrow">Kegiatan utama</p>}
+        <span className="activity-card__mascot">
+          <Mascot domain={activity.domain} size={variant === 'utama' ? 64 : 52} />
+        </span>
+        <div className="activity-card__heading">
+          {variant === 'utama' && <p className="activity-card__eyebrow">Kegiatan utama hari ini</p>}
           <Heading className="activity-card__title">{activity.judul}</Heading>
           <ul className="chips" aria-label="Keterangan kegiatan">
             <li className="chip chip--domain">{domain.nama}</li>
             <li className="chip">
-              <span aria-hidden="true">⏱️</span> {activity.durasi} menit
+              <span aria-hidden="true">⏱️</span> sekitar {activity.durasi} menit
             </li>
           </ul>
         </div>
       </header>
 
-      <section className="activity-card__section">
-        <Sub>Tujuan</Sub>
-        <p>{activity.tujuan}</p>
-      </section>
+      <p className="activity-card__goal">
+        <strong>Tujuan:</strong> {activity.tujuan}
+      </p>
 
       <section className="activity-card__section">
-        <Sub>Bahan</Sub>
-        <ul className="bahan">
-          {activity.bahan.map((b) => (
-            <li key={b}>{b}</li>
-          ))}
-        </ul>
+        <Sub>Gambaran kegiatan</Sub>
+        <p>{activity.gambaran}</p>
       </section>
 
-      <section className="activity-card__section">
-        <Sub>Langkah</Sub>
-        <ol className="langkah">
-          {activity.langkah.map((l) => (
-            <li key={l}>{l}</li>
-          ))}
-        </ol>
+      <section className="activity-card__section activity-card__why">
+        <Sub>Kenapa ini penting?</Sub>
+        <p>{activity.manfaat}</p>
+      </section>
+
+      <div className="activity-card__cols">
+        <section className="activity-card__section">
+          <Sub>Siapkan bahan</Sub>
+          <ul className="bahan">
+            {activity.bahan.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="activity-card__section">
+          <Sub>Ayo mulai</Sub>
+          <ol className="langkah">
+            {activity.langkah.map((l) => (
+              <li key={l}>{l}</li>
+            ))}
+          </ol>
+        </section>
+      </div>
+
+      <section className="activity-card__section activity-card__tips">
+        <Sub>
+          <span aria-hidden="true">💡</span> Tips & variasi
+        </Sub>
+        <p>{activity.tips}</p>
       </section>
 
       <section className="safety-box" aria-label="Catatan keselamatan">

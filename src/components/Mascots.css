@@ -1,0 +1,203 @@
+/* Animasi karakter hewan. Semua bagian bergerak memakai transform-box agar titik putar relatif ke bentuknya. */
+.mascot {
+  display: block;
+  overflow: visible;
+}
+
+.mascot g,
+.mascot path,
+.mascot ellipse {
+  transform-box: fill-box;
+}
+
+/* Kedip mata bersama */
+.m-blink {
+  transform-origin: center;
+  animation: m-blink 4.5s infinite;
+}
+
+@keyframes m-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* Kanguru: melompat */
+.m-kanguru {
+  transform-origin: 50% 100%;
+  animation: m-hop 1.6s cubic-bezier(0.3, 0, 0.4, 1) infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.m-kanguru__tail {
+  transform-origin: 100% 0%;
+  animation: m-tail 1.6s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes m-hop {
+  0%, 100% { transform: translateY(0) scale(1.04, 0.96); }
+  15% { transform: translateY(0) scale(1, 1); }
+  45% { transform: translateY(-14px) scale(0.97, 1.04); }
+  75% { transform: translateY(0) scale(1, 1); }
+  85% { transform: translateY(0) scale(1.05, 0.95); }
+}
+
+@keyframes m-tail {
+  0%, 100% { transform: rotate(0deg); }
+  45% { transform: rotate(10deg); }
+}
+
+/* Lebah: melayang dan mengepakkan sayap */
+.m-lebah__body {
+  animation: m-float 3s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.m-wing {
+  transform-origin: 50% 100%;
+  animation: m-flap 0.18s ease-in-out infinite alternate;
+}
+
+.m-wing--r {
+  animation-delay: 0.09s;
+}
+
+@keyframes m-float {
+  0%, 100% { transform: translate(0, 0) rotate(-3deg); }
+  25% { transform: translate(4px, -6px) rotate(2deg); }
+  50% { transform: translate(0, -9px) rotate(-1deg); }
+  75% { transform: translate(-4px, -4px) rotate(3deg); }
+}
+
+@keyframes m-flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.55); }
+}
+
+/* Beo: mengangguk dan mengepakkan sayap sesekali */
+.m-beo__head {
+  transform-origin: 30% 90%;
+  animation: m-nod 2.4s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.m-beo__wing {
+  transform-origin: 80% 10%;
+  animation: m-wing 2.4s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes m-nod {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-10deg); }
+  40% { transform: rotate(6deg); }
+  60% { transform: rotate(0deg); }
+}
+
+@keyframes m-wing {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  70% { transform: rotate(-25deg); }
+  80% { transform: rotate(0deg); }
+  90% { transform: rotate(-20deg); }
+}
+
+/* Burung hantu: berkedip dan melirik */
+.m-hantu {
+  transform-origin: 50% 100%;
+  animation: m-sway 4s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.m-hantu__lids {
+  transform-origin: 50% 0%;
+  transform: scaleY(0);
+  animation: m-lids 5s infinite;
+}
+
+.m-hantu__pupils {
+  animation: m-look 5s ease-in-out infinite;
+}
+
+@keyframes m-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes m-lids {
+  0%, 88%, 100% { transform: scaleY(0); }
+  92% { transform: scaleY(1); }
+  96% { transform: scaleY(0); }
+}
+
+@keyframes m-look {
+  0%, 30%, 100% { transform: translateX(0); }
+  40%, 55% { transform: translateX(-2.5px); }
+  65%, 80% { transform: translateX(2.5px); }
+}
+
+/* Gajah: mengibaskan telinga dan mengayunkan belalai */
+.m-gajah__ear {
+  transform-origin: 0% 50%;
+  animation: m-ear 2s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.m-gajah__trunk {
+  transform-origin: 100% 0%;
+  animation: m-trunk 2.6s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes m-ear {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.75); }
+}
+
+@keyframes m-trunk {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(18deg); }
+}
+
+/* Barisan karakter di bagian awal */
+.parade {
+  display: flex;
+  justify-content: center;
+  gap: clamp(2px, 2vw, 18px);
+  margin: 4px 0 0;
+}
+
+.parade__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  --delay: 0s;
+}
+
+.parade__item .mascot {
+  width: clamp(54px, 15vw, 84px);
+  height: auto;
+}
+
+.parade__item:nth-child(even) .mascot {
+  margin-top: 10px;
+}
+
+.parade__shadow {
+  width: 60%;
+  height: 6px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: rgba(43, 33, 64, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot *,
+  .mascot {
+    animation: none !important;
+  }
+
+  .m-hantu__lids {
+    transform: scaleY(0);
+  }
+}
