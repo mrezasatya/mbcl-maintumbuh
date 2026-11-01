@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arrangeDomains, buildPlan, pickRepeatDomains, eligibleByDomain } from './planner.js';
+import { arrangeDomains, buildPlan, pickRepeatDomains, eligibleByDomain, replaceDay } from './planner.js';
 import { seededRng } from './rng.js';
 import { ACTIVITIES } from '../data/activities/index.js';
 import { isActivitySafe } from './safety.js';
@@ -98,5 +98,61 @@ describe('arrangeDomains', () => {
       expect(order).toHaveLength(7);
       for (let i = 1; i < order.length; i += 1) expect(order[i]).not.toBe(order[i - 1]);
     }
+  });
+});
+
+describe('replaceDay: ganti kegiatan satu hari', () => {
+  it('hanya hari yang dipilih yang berubah, dan hasilnya tetap sah', () => {
+    for (let m = MIN_MONTHS; m <= MAX_MONTHS; m += 1) {
+      for (let s = 0; s < 5; s += 1) {
+        const rng = seededRng(m * 77 + s);
+        const plan = buildPlan(m, ACTIVITIES, rng);
+        const idx = s % 7;
+        const next = replaceDay(plan, idx, ACTIVITIES, rng);
+        if (!next) continue;
+        next.days.forEach((d, i) => {
+          if (i !== idx) {
+            expect(d).toBe(plan.days[i]);
+          } else {
+            expect(d.domain).toBe(plan.days[i].domain);
+            expect(d.utama.id).not.toBe(plan.days[i].utama.id);
+          }
+        });
+        const ids = next.days.flatMap((d) => [d.utama.id, d.cadangan.id]);
+        expect(new Set(ids).size).toBe(14);
+        for (const d of next.days) {
+          for (const a of [d.utama, d.cadangan]) {
+            expect(a.domain).toBe(d.domain);
+            expect(a.min <= m && m <= a.max).toBe(true);
+            expect(isActivitySafe(a, m)).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it('bisa diganti berulang kali tanpa macet', () => {
+    const rng = seededRng(3);
+    let plan = buildPlan(20, ACTIVITIES, rng);
+    const seen = new Set([plan.days[0].utama.id]);
+    for (let i = 0; i < 20; i += 1) {
+      plan = replaceDay(plan, 0, ACTIVITIES, rng);
+      expect(plan).not.toBeNull();
+      seen.add(plan.days[0].utama.id);
+    }
+    expect(seen.size).toBeGreaterThan(1);
+  });
+
+  it('mengembalikan null bila tidak ada kegiatan lain', () => {
+    const plan = buildPlan(30, ACTIVITIES, seededRng(5));
+    const onlyPlanned = plan.days.flatMap((d) => [d.utama, d.cadangan]);
+    expect(replaceDay(plan, 0, onlyPlanned, seededRng(6))).toBeNull();
+  });
+
+  it('tidak mengubah rencana asli', () => {
+    const plan = buildPlan(40, ACTIVITIES, seededRng(9));
+    const before = plan.days.map((d) => d.utama.id).join();
+    replaceDay(plan, 2, ACTIVITIES, seededRng(10));
+    expect(plan.days.map((d) => d.utama.id).join()).toBe(before);
   });
 });

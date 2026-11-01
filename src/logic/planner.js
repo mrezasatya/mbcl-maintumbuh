@@ -97,3 +97,29 @@ export function buildPlan(months, library, rng = defaultRng) {
   });
   return { months, band: ageBand(months), repeated, days, filters: activeFilters(months) };
 }
+
+/**
+ * Mengganti kegiatan pada satu hari saja; hari lain tidak berubah.
+ * Kegiatan pengganti tetap satu domain, cocok usia, aman, dan tidak dipakai di hari lain.
+ * Mengembalikan rencana baru, atau null bila tidak ada kegiatan lain yang bisa dipilih.
+ */
+export function replaceDay(plan, dayIndex, library, rng = defaultRng) {
+  const day = plan.days[dayIndex];
+  if (!day) throw new Error(`Hari ke-${dayIndex + 1} tidak ada di rencana.`);
+  const pool = eligibleByDomain(plan.months, library)[day.domain];
+  const usedElsewhere = new Set(
+    plan.days.filter((_, i) => i !== dayIndex).flatMap((d) => [d.utama.id, d.cadangan.id]),
+  );
+  const current = new Set([day.utama.id, day.cadangan.id]);
+  const fresh = pool.filter((a) => !usedElsewhere.has(a.id) && !current.has(a.id));
+  if (fresh.length === 0) return null;
+
+  const used = new Set([...usedElsewhere, ...current]);
+  const utama = drawActivity(fresh, used, plan.months, rng);
+  const sisa = fresh.filter((a) => a.id !== utama.id);
+  // Bila kegiatan baru tinggal satu, kegiatan utama lama menjadi cadangan.
+  const cadangan = sisa.length > 0 ? drawActivity(sisa, used, plan.months, rng) : day.utama;
+
+  const days = plan.days.map((d, i) => (i === dayIndex ? { ...d, utama, cadangan } : d));
+  return { ...plan, days };
+}

@@ -1,7 +1,7 @@
 # Main Tumbuh
 
 Penyusun rencana belajar-bermain 7 hari untuk orang tua dan anak usia **1 sampai 6 tahun**
-(12 sampai 83 bulan). Gratis, tanpa login, tidak menyimpan data, dan memakai bahan dari rumah.
+(12 sampai 83 bulan). Gratis, tanpa login, tanggal lahir tidak disimpan, dan memakai bahan dari rumah.
 
 Main Tumbuh adalah **panduan stimulasi berbasis titik checklist perkembangan CDC**, bukan kurikulum,
 bukan alat diagnosis, dan bukan klaim setara sekolah tertentu.
@@ -12,11 +12,14 @@ bukan alat diagnosis, dan bukan klaim setara sekolah tertentu.
 2. Validasi: kosong, tidak valid, masa depan, terlalu muda (< 12 bulan, disertai saran ke dokter anak/bidan/posyandu), terlalu tua (> 83 bulan).
 3. Usia dalam bulan, ditampilkan "x tahun y bulan", dipetakan ke titik CDC terakhir yang sudah dilewati: 12, 15, 18, 24, 30 bulan, 3, 4, 5 tahun (titik 5 tahun dipakai sampai 6 tahun 11 bulan).
 4. Rencana 7 hari: satu domain per hari, tidak ada domain sama berurutan, kelima domain muncul, dua domain tambahan dipilih berbobot menurut usia.
-5. Kartu kegiatan: judul, tujuan, gambaran kegiatan, kenapa ini penting, bahan, langkah, tips & variasi, durasi, catatan keselamatan, plus satu kegiatan cadangan per hari.
+5. Kartu kegiatan: judul, tujuan, gambaran kegiatan, kenapa ini penting, bahan, langkah bergambar, tips & variasi, durasi, catatan keselamatan, plus satu kegiatan cadangan per hari. Bahasa penjelasan menyapa "Ayah/Bunda".
 6. Penyaring keselamatan yang lebih ketat dari standar umum (tabel di bawah).
 7. Disclaimer di bawah halaman.
 8. Lima karakter hewan orisinal yang bergerak (SVG + CSS), satu per domain. Animasi berhenti otomatis bila perangkat meminta gerak dikurangi (`prefers-reduced-motion`).
 9. Musik instrumental opsional: melodi kotak musik ciptaan sendiri yang dibuat langsung di browser dengan Web Audio API (`src/logic/melody.js`, `src/audio/musicBox.js`). Tanpa berkas audio, tidak berbunyi otomatis, dan berhenti saat tab disembunyikan.
+10. **Ganti kegiatan hari ini**: mengganti kegiatan satu hari saja (domain sama, tetap cocok usia dan aman, tidak dobel dengan hari lain); hari lain tidak berubah. `replaceDay` di `src/logic/planner.js`.
+11. **Riwayat**: tombol "Tandai sudah dilakukan" di kartu, laman Riwayat (`#riwayat`) dengan jumlah kegiatan, hari bermain, sebaran per domain, catatan per tanggal, hapus satu, dan hapus semua (dengan konfirmasi).
+12. **Ilustrasi langkah**: 55 gambar SVG orisinal (`src/components/StepArt.jsx`) dipasangkan otomatis ke setiap langkah lewat aturan kata kunci (`src/logic/stepArt.js`).
 
 Sengaja tidak ada tombol cetak/PDF.
 
@@ -70,10 +73,12 @@ npm run test:e2e
 src/
   logic/        config.js age.js safety.js planner.js rng.js (+ *.test.js)  -- logika murni tanpa React
   logic/melody.js  data melodi kotak musik (+ melody.test.js)
+  logic/history.js  riwayat kegiatan + penyimpanan di perangkat (+ history.test.js)
+  logic/stepArt.js  aturan pemilihan ilustrasi langkah (+ stepArt.test.js)
   audio/musicBox.js  pemutar Web Audio
   data/activities/  helper.js kasar.js halus.js bahasa.js kognitif.js sosem.js index.js (+ library.test.js)
   data/activities/detail/  penjelasan rinci (gambaran, manfaat, tips) per domain
-  components/   Logo BirthForm PlanView ActivityCard Mascots MusicToggle SafetyPanel Disclaimer
+  components/   Logo BirthForm PlanView ActivityCard StepArt HistoryView Mascots MusicToggle SafetyPanel Disclaimer
   App.jsx App.css index.css main.jsx
 e2e/browser-check.cjs
 docs/referensi/  bahan referensi internal (tidak di-deploy)
@@ -142,4 +147,11 @@ Aplikasi ini satu halaman tanpa routing, jadi tidak perlu aturan rewrite.
 - **Audit kata kunci** memeriksa judul, tujuan, bahan, dan langkah. Catatan keselamatan dikecualikan karena wajar menyebut bahaya ("jauhkan dari pisau"), tetapi tetap ikut audit kata terlarang.
 - **Ganti usia** menutup rencana dan memfokuskan kembali form.
 - **Lampiran referensi** belum ada di repositori saat proyek dibangun; pustaka disusun sendiri (lihat `docs/referensi/README.md`).
-- Tidak ada localStorage, cookie, analitik, atau permintaan jaringan selain memuat aset aplikasi; font di-bundle lewat `@fontsource`.
+- **Penyimpanan data (diubah pada revisi 2):** brief awal melarang penyimpanan apa pun. Fitur Riwayat yang diminta kemudian
+  membutuhkan penyimpanan, jadi dipilih opsi paling minimal: hanya id kegiatan, judul, domain, dan tanggal selesai, disimpan
+  di `localStorage` perangkat itu sendiri (kunci `maintumbuh.riwayat.v1`, maks 500 catatan). Tanggal lahir anak tidak disimpan,
+  tidak ada cookie, analitik, atau pengiriman ke server. Penyimpanan baru terjadi setelah orang tua menandai kegiatan, dan bisa
+  dihapus dari laman Riwayat. Bila browser memblokir penyimpanan, riwayat tetap jalan selama halaman terbuka dan pengguna diberi tahu.
+- Font di-bundle lewat `@fontsource`; tidak ada permintaan jaringan selain memuat aset aplikasi.
+- **Ilustrasi langkah** bersifat ikon/adegan sederhana, bukan foto atau ilustrasi khusus per langkah. Untuk versi berikutnya,
+  ilustrasi yang dibuat khusus (ilustrator atau gambar AI yang ditinjau) bisa menggantikan konsep di `StepArt.jsx` tanpa mengubah logika.

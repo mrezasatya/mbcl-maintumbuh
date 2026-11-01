@@ -15,7 +15,7 @@ export default function Disclaimer() {
           kegiatan. Sesuaikan dengan minat dan kemampuan anak, dan tidak apa-apa bila anak belum bisa.
         </li>
         <li>
-          Bila Anda khawatir tentang kemampuan bicara, gerak, pendengaran, penglihatan, atau perilaku anak, atau
+          Bila Ayah/Bunda khawatir tentang kemampuan bicara, gerak, pendengaran, penglihatan, atau perilaku anak, atau
           anak kehilangan kemampuan yang sebelumnya sudah ada, <strong>segera periksakan ke dokter anak atau
           fasilitas kesehatan terdekat</strong>.
         </li>
@@ -28,8 +28,9 @@ export default function Disclaimer() {
           bukan klaim setara dengan sekolah atau program tertentu.
         </li>
         <li>
-          Tidak ada login dan tidak ada data yang disimpan. Bulan dan tahun lahir hanya dipakai di perangkat Anda
-          selama halaman terbuka.
+          Tidak ada login dan tidak ada akun. Bulan dan tahun lahir si kecil tidak disimpan. Riwayat kegiatan yang
+          Ayah/Bunda tandai "sudah dilakukan" hanya disimpan di perangkat ini (penyimpanan browser), tidak dikirim
+          ke mana pun, dan bisa dihapus kapan saja dari laman Riwayat.
         </li>
       </ul>
     </section>

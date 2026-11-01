@@ -130,7 +130,47 @@ async function noOverflow(page, width) {
       await page.getByRole('button', { name: /Hari berikutnya/ }).click();
       check((await tabs.nth(1).getAttribute('aria-selected')) === 'true', 'tombol Hari berikutnya');
 
-      // Susun ulang
+      // Gambar di setiap langkah
+      const stepCount = await page.locator('.activity-card--utama .langkah li').count();
+      const artCount = await page.locator('.activity-card--utama .langkah .step-art').count();
+      check(stepCount > 0 && stepCount === artCount, `setiap langkah punya gambar (${artCount}/${stepCount})`);
+
+      // Ganti kegiatan satu hari saja
+      const mainTitle = () => page.locator('.activity-card--utama .activity-card__title').innerText();
+      await tabs.nth(2).click();
+      const day3Before = await mainTitle();
+      await tabs.nth(1).click();
+      const day2Before = await mainTitle();
+      const domainsBefore = (await page.locator('.day-tab__domain').allInnerTexts()).join('|');
+      await page.getByRole('button', { name: 'Ganti kegiatan hari ini' }).click();
+      const day2After = await mainTitle();
+      check(day2After !== day2Before, `Ganti kegiatan hari ini mengubah Hari 2 (${day2Before} -> ${day2After})`);
+      check((await page.locator('.day-tab__domain').allInnerTexts()).join('|') === domainsBefore, 'urutan domain tetap');
+      await tabs.nth(2).click();
+      check((await mainTitle()) === day3Before, 'Hari 3 tidak berubah');
+      await tabs.nth(1).click();
+
+      // Tandai sudah dilakukan -> riwayat
+      await page.getByRole('button', { name: 'Tandai sudah dilakukan' }).first().click();
+      check((await page.locator('.main-nav__count').innerText()) === '1', 'penghitung riwayat bertambah');
+      check((await page.locator('.day-tab__done').count()) >= 1, 'tab hari diberi tanda selesai');
+      check(await page.getByRole('button', { name: /sudah dilakukan hari ini/ }).first().isVisible(), 'tombol berubah jadi sudah dilakukan');
+      await page.getByRole('link', { name: /Riwayat/ }).click();
+      await page.getByRole('heading', { name: 'Riwayat bermain si kecil' }).waitFor();
+      check((await page.locator('.history-item').count()) === 1, 'riwayat menampilkan 1 kegiatan');
+      check((await page.locator('.history-item strong').innerText()) === day2After, 'judul di riwayat sesuai');
+      await page.screenshot({ path: path.join(SHOT_DIR, `riwayat-${width}.png`), fullPage: true });
+      await page.reload();
+      await page.getByRole('heading', { name: 'Riwayat bermain si kecil' }).waitFor();
+      check((await page.locator('.history-item').count()) === 1, 'riwayat tetap ada setelah halaman dimuat ulang');
+      await page.locator('.history-item__remove').click();
+      check(await page.getByText('Belum ada kegiatan yang ditandai').isVisible(), 'hapus satu catatan -> kosong');
+      const stored = await page.evaluate(() => localStorage.getItem('maintumbuh.riwayat.v1'));
+      check(stored === null, 'storage bersih setelah riwayat kosong');
+      await page.getByRole('button', { name: 'Lihat rencana bermain' }).click();
+      await choose(page, monthsAgo(27));
+      await page.getByRole('heading', { name: 'Hore, rencana 7 hari sudah siap!' }).waitFor();
+
       const signature = async () => (await page.locator('.day-tab__domain').allInnerTexts()).join('|') +
         (await page.locator('.activity-card--utama .activity-card__title').innerText());
       const seen = new Set([await signature()]);
@@ -158,6 +198,18 @@ async function noOverflow(page, width) {
       for (const t of ['Gambaran kegiatan', 'Kenapa ini penting?', 'Siapkan bahan', 'Ayo mulai', 'Tips & variasi']) {
         check(await page.locator('.activity-card--utama').getByRole('heading', { name: t }).isVisible(), `kartu memuat bagian "${t}"`);
       }
+
+      // Hapus semua riwayat dengan konfirmasi
+      await page.getByRole('button', { name: 'Tandai sudah dilakukan' }).first().click();
+      await page.getByRole('link', { name: /Riwayat/ }).click();
+      await page.getByRole('link', { name: 'Lewati ke isi utama' }).focus();
+      await page.keyboard.press('Enter');
+      check(await page.getByRole('heading', { name: 'Riwayat bermain si kecil' }).isVisible(), 'tautan lewati tidak keluar dari laman Riwayat');
+      await page.getByRole('button', { name: 'Hapus semua riwayat' }).click();
+      await page.getByRole('button', { name: 'Ya, hapus semua' }).click();
+      check(await page.getByText('Belum ada kegiatan yang ditandai').isVisible(), 'hapus semua riwayat');
+      await page.getByRole('link', { name: /Rencana/ }).click();
+      await page.getByRole('heading', { name: 'Hore, rencana 7 hari sudah siap!' }).waitFor();
 
       // Ganti usia
       await page.getByRole('button', { name: 'Ganti usia' }).click();
