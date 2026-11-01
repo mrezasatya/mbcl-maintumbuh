@@ -1,12 +1,15 @@
 import { DOMAINS } from '../logic/config.js';
 import { SAFETY_TAGS, generalSupervision } from '../logic/safety.js';
 import { Mascot } from './Mascots.jsx';
+import StepArt from './StepArt.jsx';
+import { stepConcepts } from '../logic/stepArt.js';
 
-export default function ActivityCard({ activity, months, variant = 'utama', headingLevel = 3 }) {
+export default function ActivityCard({ activity, months, variant = 'utama', headingLevel = 3, doneToday = false, onToggleDone }) {
   const domain = DOMAINS[activity.domain];
   const Heading = `h${headingLevel}`;
   const Sub = `h${Math.min(headingLevel + 1, 6)}`;
   const tags = activity.risiko.map((tag) => ({ tag, ...SAFETY_TAGS[tag] }));
+  const arts = stepConcepts(activity);
 
   return (
     <article
@@ -56,8 +59,14 @@ export default function ActivityCard({ activity, months, variant = 'utama', head
         <section className="activity-card__section">
           <Sub>Ayo mulai</Sub>
           <ol className="langkah">
-            {activity.langkah.map((l) => (
-              <li key={l}>{l}</li>
+            {activity.langkah.map((l, i) => (
+              <li key={l}>
+                <span className="langkah__art">
+                  <StepArt concept={arts[i]} />
+                  <span className="langkah__num" aria-hidden="true">{i + 1}</span>
+                </span>
+                <span className="langkah__text">{l}</span>
+              </li>
             ))}
           </ol>
         </section>
@@ -92,6 +101,21 @@ export default function ActivityCard({ activity, months, variant = 'utama', head
           </div>
         ))}
       </section>
+
+      {onToggleDone && (
+        <div className="done-row">
+          <button
+            type="button"
+            className={`btn btn-done${doneToday ? ' is-done' : ''}`}
+            aria-pressed={doneToday}
+            onClick={() => onToggleDone(activity)}
+          >
+            <span aria-hidden="true">{doneToday ? '✅' : '⭐'}</span>
+            {doneToday ? 'Hore, sudah dilakukan hari ini!' : 'Tandai sudah dilakukan'}
+          </button>
+          {doneToday && <span className="done-row__hint">Tekan lagi untuk membatalkan.</span>}
+        </div>
+      )}
     </article>
   );
 }

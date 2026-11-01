@@ -1,10 +1,12 @@
 import { forwardRef, useRef } from 'react';
 import ActivityCard from './ActivityCard.jsx';
-import { Mascot } from './Mascots.jsx';
 import { DOMAINS } from '../logic/config.js';
 import { formatAge } from '../logic/age.js';
 
-const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, onReshuffle, onChangeAge }, headingRef) {
+const PlanView = forwardRef(function PlanView(
+  { plan, activeDay, onSelectDay, onReshuffle, onChangeAge, onReplaceDay, isDoneToday, everDone, onToggleDone, status },
+  headingRef,
+) {
   const tabRefs = useRef([]);
   const { days, months, band, filters } = plan;
   const day = days[activeDay];
@@ -52,6 +54,10 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
             <span aria-hidden="true">🎂</span> Ganti usia
           </button>
         </div>
+        <p className="plan-summary__hint">
+          "Susun ulang" mengganti seluruh minggu. Kalau hanya satu hari yang kurang cocok, pakai tombol{' '}
+          <strong>Ganti kegiatan hari ini</strong> di bawah, hari lainnya tetap.
+        </p>
         <div className="filter-note">
           <p>
             <span aria-hidden="true">🛡️</span> <strong>Penyaring keselamatan aktif.</strong> Demi keamanan si
@@ -72,6 +78,7 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
         {days.map((d, i) => {
           const dm = DOMAINS[d.domain];
           const selected = i === activeDay;
+          const done = everDone(d.utama.id) || everDone(d.cadangan.id);
           return (
             <button
               key={d.hari}
@@ -90,6 +97,12 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
               <span className="day-tab__day">Hari {d.hari}</span>
               <span className="day-tab__emoji" aria-hidden="true">{dm.emoji}</span>
               <span className="day-tab__domain">{dm.nama}</span>
+              {done && (
+                <span className="day-tab__done" title="Sudah pernah dilakukan">
+                  <span aria-hidden="true">✓</span>
+                  <span className="visually-hidden">, sudah dilakukan</span>
+                </span>
+              )}
             </button>
           );
         })}
@@ -102,18 +115,40 @@ const PlanView = forwardRef(function PlanView({ plan, activeDay, onSelectDay, on
         aria-labelledby={`tab-hari-${day.hari}`}
         tabIndex={0}
       >
+        <div className="day-panel__head">
         <p className="day-panel__intro">
           <strong>Hari {day.hari}</strong> · hari ini kita bermain sambil melatih <strong>{domain.nama}</strong>{' '}
           bersama {domain.hewan} <span aria-hidden="true">{domain.emoji}</span>
         </p>
-        <ActivityCard activity={day.utama} months={months} variant="utama" headingLevel={3} />
+        <button type="button" className="btn btn--ghost btn--sm" onClick={() => onReplaceDay(activeDay)}>
+          <span aria-hidden="true">🔁</span> Ganti kegiatan hari ini
+        </button>
+        </div>
+        <p className="visually-hidden" role="status" aria-live="polite">{status}</p>
+        <ActivityCard
+          key={day.utama.id}
+          activity={day.utama}
+          months={months}
+          variant="utama"
+          headingLevel={3}
+          doneToday={isDoneToday(day.utama.id)}
+          onToggleDone={onToggleDone}
+        />
 
         <details className="backup" style={{ '--accent': domain.warna, '--accent-soft': domain.lembut }}>
           <summary>
             <span aria-hidden="true">🎒</span> Kegiatan cadangan: {day.cadangan.judul}
           </summary>
           <p className="backup__hint">Kalau si kecil sedang kurang tertarik atau bahannya tidak ada, coba yang ini.</p>
-          <ActivityCard activity={day.cadangan} months={months} variant="cadangan" headingLevel={4} />
+          <ActivityCard
+            key={day.cadangan.id}
+            activity={day.cadangan}
+            months={months}
+            variant="cadangan"
+            headingLevel={4}
+            doneToday={isDoneToday(day.cadangan.id)}
+            onToggleDone={onToggleDone}
+          />
         </details>
 
         <nav className="day-nav" aria-label="Navigasi hari">

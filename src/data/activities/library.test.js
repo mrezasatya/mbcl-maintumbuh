@@ -78,6 +78,11 @@ describe('audit pustaka kegiatan', () => {
     }
   });
 
+  it('bahasa personal: menyapa Ayah/Bunda, tidak memakai "Anda"', () => {
+    const problems = ACTIVITIES.filter((a) => /\bAnda\b/.test(fullText(a))).map((a) => a.id);
+    expect(problems).toEqual([]);
+  });
+
   it('tidak ada penjelasan rinci tanpa kegiatan', () => {
     const ids = new Set(ACTIVITIES.map((a) => a.id));
     expect(Object.keys(DETAILS).filter((id) => !ids.has(id))).toEqual([]);
